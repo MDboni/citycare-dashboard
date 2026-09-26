@@ -1,8 +1,9 @@
 "use client";
 
-import { SearchIcon, ShieldIcon, UsersIcon } from "lucide-react";
+import { PlusIcon, SearchIcon, ShieldIcon, UsersIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { CreateStaffDialog } from "@/components/access/create-staff-dialog";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ErrorState } from "@/components/shared/error-state";
 import { TableSkeleton } from "@/components/shared/loading";
@@ -46,6 +47,7 @@ export function UserRolesTab() {
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState<AdminUser | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [creating, setCreating] = useState(false);
 
   const roles = useRoles();
   const assign = useAssignUserRoles();
@@ -61,6 +63,13 @@ export function UserRolesTab() {
   const openEditor = (user: AdminUser) => {
     setEditing(user);
     setSelected(new Set());
+  };
+
+  // Straight from creation into the role picker: a brand-new officer would
+  // otherwise sit on the built-in fallback until somebody came back for it.
+  const afterCreate = (user: AdminUser) => {
+    setCreating(false);
+    openEditor(user);
   };
 
   // The dialog's checkboxes start from whatever the server says this user holds.
@@ -100,20 +109,32 @@ export function UserRolesTab() {
           Give a staff member one or more roles. Leave someone with none and
           they keep the built-in access for their account type.
         </p>
-        <div className="relative w-full sm:w-64">
-          <SearchIcon
-            className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground"
-            aria-hidden
-          />
-          <Input
-            className="pl-8"
-            placeholder="Search staff"
-            value={search}
-            aria-label="Search staff"
-            onChange={(event) => setSearch(event.target.value)}
-          />
+        <div className="flex w-full items-center gap-2 sm:w-auto">
+          <div className="relative w-full sm:w-64">
+            <SearchIcon
+              className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground"
+              aria-hidden
+            />
+            <Input
+              className="pl-8"
+              placeholder="Search staff"
+              value={search}
+              aria-label="Search staff"
+              onChange={(event) => setSearch(event.target.value)}
+            />
+          </div>
+          <Button className="shrink-0" onClick={() => setCreating(true)}>
+            <PlusIcon data-icon="inline-start" />
+            New user
+          </Button>
         </div>
       </div>
+
+      <CreateStaffDialog
+        open={creating}
+        onOpenChange={setCreating}
+        onCreated={afterCreate}
+      />
 
       {isPending && <TableSkeleton rows={5} columns={4} />}
       {isError && <ErrorState error={error} onRetry={() => void refetch()} />}
@@ -123,6 +144,12 @@ export function UserRolesTab() {
           icon={UsersIcon}
           title="No staff found"
           description="Officers and admins appear here once they exist."
+          action={
+            <Button onClick={() => setCreating(true)}>
+              <PlusIcon data-icon="inline-start" />
+              New user
+            </Button>
+          }
         />
       )}
 
