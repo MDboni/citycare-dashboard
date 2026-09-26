@@ -1,26 +1,551 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-heading-family);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Tailwind's stock leading for small text is 1.43, which reads as cramped in
+     a paragraph. These are the app's body metrics, set once. */
+  --text-xs--line-height: 1.5;
+  --text-sm--line-height: 1.6;
+  --text-base--line-height: 1.65;
+  --text-lg--line-height: 1.6;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ---------------------------------------------------------------------------
+   CityCare palette. A civic-blue primary with a teal-leaning accent, tuned so
+   the six status colours below stay distinguishable side by side in a table.
+   Every value is oklch so light and dark keep the same perceived lightness.
+--------------------------------------------------------------------------- */
+:root {
+  /* The content frame. Wide enough that a list or table page fills a desktop
+     screen instead of stranding one column between two empty gutters;
+     --shell-read pulls prose and forms back to a measure the eye can track. */
+  --shell: 96rem;
+  --shell-read: 64rem;
+
+  /* One motion vocabulary. Every animation and transition in the app borrows
+     these durations and this curve, so nothing feels imported from elsewhere. */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-fast: 180ms;
+  --motion-slow: 460ms;
+
+  --background: oklch(0.994 0.002 250);
+  --foreground: oklch(0.21 0.022 256);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.21 0.022 256);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.21 0.022 256);
+  --primary: oklch(0.52 0.135 245);
+  --primary-foreground: oklch(0.985 0.006 245);
+  --secondary: oklch(0.965 0.008 250);
+  --secondary-foreground: oklch(0.28 0.03 252);
+  --muted: oklch(0.967 0.006 250);
+  --muted-foreground: oklch(0.525 0.022 254);
+  --accent: oklch(0.948 0.031 215);
+  --accent-foreground: oklch(0.32 0.075 240);
+  --destructive: oklch(0.575 0.212 25.5);
+  --destructive-foreground: oklch(0.985 0.01 25);
+  --success: oklch(0.565 0.128 157);
+  --success-foreground: oklch(0.985 0.012 157);
+  --warning: oklch(0.7 0.145 72);
+  --warning-foreground: oklch(0.26 0.05 72);
+  --info: oklch(0.58 0.13 238);
+  --info-foreground: oklch(0.985 0.008 238);
+  --border: oklch(0.912 0.008 252);
+  --input: oklch(0.9 0.01 252);
+  --ring: oklch(0.52 0.135 245);
+  /* Chart slots are hex, not oklch, and the order is fixed.
+     These exact values were run through the palette validator against the white
+     card surface and pass the lightness band, the chroma floor, adjacent-pair
+     separation under protanopia and deuteranopia, the normal-vision floor and
+     3:1 contrast. oklch would be prettier to read, but the teal sits on the
+     sRGB gamut edge and gets its chroma clipped on the way out, which is what
+     failed the floor the first time — hex is what was measured, so hex ships.
+     Assign these in order; never cycle them and never generate a sixth. */
+  --chart-1: #006eb1;
+  --chart-2: #c87e00;
+  --chart-3: #0096a8;
+  --chart-4: #7a41af;
+  --chart-5: #429c5a;
+  /* A single-hue ramp, light to dark, for an ordered scale such as priority. */
+  --ramp-1: #83b4de;
+  --ramp-2: #5399d1;
+  --ramp-3: #1c7abb;
+  --ramp-4: #00599c;
+  --radius: 0.625rem;
+  --sidebar: oklch(0.982 0.005 250);
+  --sidebar-foreground: oklch(0.21 0.022 256);
+  --sidebar-primary: oklch(0.52 0.135 245);
+  --sidebar-primary-foreground: oklch(0.985 0.006 245);
+  --sidebar-accent: oklch(0.948 0.031 215);
+  --sidebar-accent-foreground: oklch(0.32 0.075 240);
+  --sidebar-border: oklch(0.912 0.008 252);
+  --sidebar-ring: oklch(0.52 0.135 245);
+  --font-sans: var(--font-geist-sans);
+  --font-heading-family: var(--font-jakarta);
+}
+
+.dark {
+  --background: oklch(0.172 0.016 256);
+  --foreground: oklch(0.965 0.006 250);
+  --card: oklch(0.215 0.019 256);
+  --card-foreground: oklch(0.965 0.006 250);
+  --popover: oklch(0.228 0.02 256);
+  --popover-foreground: oklch(0.965 0.006 250);
+  --primary: oklch(0.685 0.132 240);
+  --primary-foreground: oklch(0.185 0.03 245);
+  --secondary: oklch(0.278 0.022 256);
+  --secondary-foreground: oklch(0.955 0.006 250);
+  --muted: oklch(0.272 0.02 256);
+  --muted-foreground: oklch(0.715 0.018 252);
+  --accent: oklch(0.32 0.05 230);
+  --accent-foreground: oklch(0.925 0.032 215);
+  --destructive: oklch(0.672 0.185 23);
+  --destructive-foreground: oklch(0.16 0.03 25);
+  --success: oklch(0.7 0.125 158);
+  --success-foreground: oklch(0.17 0.03 158);
+  --warning: oklch(0.79 0.135 75);
+  --warning-foreground: oklch(0.2 0.04 75);
+  --info: oklch(0.7 0.12 238);
+  --info-foreground: oklch(0.17 0.03 238);
+  --border: oklch(1 0 0 / 11%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: oklch(0.685 0.132 240);
+  /* Dark mode is its own set of steps, validated against the dark card surface —
+     not an automatic flip of the light values, which fell outside the dark
+     lightness band and put blue and teal within 11 ΔE of each other. */
+  --chart-1: #318edc;
+  --chart-2: #bb7400;
+  --chart-3: #00a7a9;
+  --chart-4: #8951bf;
+  --chart-5: #309154;
+  --ramp-1: #8fbde5;
+  --ramp-2: #599fd8;
+  --ramp-3: #1d80c4;
+  --ramp-4: #005f9e;
+  --sidebar: oklch(0.195 0.018 256);
+  --sidebar-foreground: oklch(0.965 0.006 250);
+  --sidebar-primary: oklch(0.685 0.132 240);
+  --sidebar-primary-foreground: oklch(0.185 0.03 245);
+  --sidebar-accent: oklch(0.32 0.05 230);
+  --sidebar-accent-foreground: oklch(0.925 0.032 215);
+  --sidebar-border: oklch(1 0 0 / 11%);
+  --sidebar-ring: oklch(0.685 0.132 240);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+  /* Smooth scrolling is motion too, so the OS setting gets to veto it. */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+  /* The number spinners fight the design on every fee and ward-number input. */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* One ramp for headings, so a page never invents its own scale.
+     The line-heights are explicit because Tailwind ships leading-1 on its large
+     sizes: fine for a headline that fits on one line, squashed the moment it
+     wraps — and every headline here wraps. Tracking loosens as the size drops,
+     which is the opposite of applying one tracking-tight to all three. */
+  .h-display {
+    @apply font-heading font-bold text-balance;
+    font-size: clamp(2.5rem, 1.85rem + 2.1vw, 3.5rem);
+    line-height: 1.08;
+    letter-spacing: -0.032em;
+  }
+
+  /* The marketing-sized section head, used by the landing page. */
+  .h-section-lg {
+    @apply font-heading font-semibold text-balance;
+    font-size: clamp(1.875rem, 1.5rem + 1.5vw, 2.625rem);
+    line-height: 1.16;
+    letter-spacing: -0.026em;
+  }
+
+  /* The page title on every signed-in route. */
+  .h-section {
+    @apply font-heading font-semibold text-balance;
+    font-size: clamp(1.5rem, 1.35rem + 0.6vw, 1.875rem);
+    line-height: 1.22;
+    letter-spacing: -0.021em;
+  }
+
+  .h-card {
+    @apply font-heading text-base font-semibold;
+    line-height: 1.4;
+    letter-spacing: -0.012em;
+  }
+
+  /* The paragraph that follows a display or section head. */
+  .lead {
+    font-size: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
+    line-height: 1.65;
+    letter-spacing: -0.005em;
+    text-wrap: pretty;
+  }
+
+  /* The page frame every route shares: one gutter, one max width. */
+  .page-shell {
+    @apply mx-auto w-full px-4 sm:px-6 lg:px-10;
+    max-width: var(--shell);
+  }
+
+  /* Opts a single reading column back out of the full width: forms, detail
+     pages, anything that is mostly paragraphs. */
+  .page-shell-read {
+    max-width: var(--shell-read);
+  }
+
+  /* A soft civic wash used behind hero and auth panels. */
+  .surface-wash {
+    background-image:
+      radial-gradient(
+        68rem 38rem at 12% -12%,
+        color-mix(in oklch, var(--primary) 16%, transparent),
+        transparent 60%
+      ),
+      radial-gradient(
+        52rem 30rem at 92% 8%,
+        color-mix(in oklch, var(--chart-2) 14%, transparent),
+        transparent 62%
+      );
+  }
+}
+
+@layer utilities {
+  /* Keeps long ids, emails and tracking codes from widening a flex row. */
+  .truncate-id {
+    @apply block max-w-full truncate font-mono text-xs;
+  }
+}
+
+/* ------------------------------------------------------------------ motion
+   Entrances are declared with a class rather than driven from React, so a
+   server-rendered page animates on its first paint without shipping a hook to
+   do it. Every rule here collapses to the finished state under
+   prefers-reduced-motion: the motion is a nicety, never the reveal. */
+@layer utilities {
+  @keyframes cc-rise {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 12px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes cc-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes cc-pop {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .cc-rise {
+    animation: cc-rise var(--motion-slow) var(--ease-out-soft) both;
+  }
+  .cc-fade {
+    animation: cc-fade var(--motion-slow) var(--ease-out-soft) both;
+  }
+  .cc-pop {
+    animation: cc-pop 260ms var(--ease-out-soft) both;
+  }
+
+  /* Hand-set delays for a sequenced hero or header block. */
+  .cc-delay-1 {
+    animation-delay: 70ms;
+  }
+  .cc-delay-2 {
+    animation-delay: 140ms;
+  }
+  .cc-delay-3 {
+    animation-delay: 210ms;
+  }
+  .cc-delay-4 {
+    animation-delay: 280ms;
+  }
+
+  /* Staggers direct children without a delay prop on each one. The lists are
+     .map() callbacks, and threading an index into row components that have no
+     other use for one would be a worse trade than ten nth-child rules. */
+  .cc-stagger > * {
+    animation: var(--cc-enter, cc-rise) var(--motion-slow) var(--ease-out-soft)
+      both;
+  }
+
+  /* A heavier entrance for the one place it belongs: the first screen. Text
+     resolving out of a blur costs more to paint, so it stays off lists. */
+  .cc-stagger-blur {
+    --cc-enter: cc-blur-rise;
+  }
+  .cc-stagger > *:nth-child(2) {
+    animation-delay: 45ms;
+  }
+  .cc-stagger > *:nth-child(3) {
+    animation-delay: 90ms;
+  }
+  .cc-stagger > *:nth-child(4) {
+    animation-delay: 135ms;
+  }
+  .cc-stagger > *:nth-child(5) {
+    animation-delay: 180ms;
+  }
+  .cc-stagger > *:nth-child(6) {
+    animation-delay: 225ms;
+  }
+  .cc-stagger > *:nth-child(7) {
+    animation-delay: 270ms;
+  }
+  .cc-stagger > *:nth-child(8) {
+    animation-delay: 315ms;
+  }
+  /* Past the eighth row the delay stops growing, or the last item on a
+     fifty-row page would wait two seconds to appear. */
+  .cc-stagger > *:nth-child(n + 9) {
+    animation-delay: 360ms;
+  }
+
+  /* Below-the-fold sections. The plain rule runs on load, which is all a
+     browser without scroll-driven animations can do; where view() exists the
+     section instead rises as it scrolls into frame. An element already on
+     screen at load is past the entry range, so it renders finished rather than
+     blank — the failure mode of a reveal that never fires. */
+  .cc-reveal {
+    animation: cc-rise var(--motion-slow) var(--ease-out-soft) both;
+  }
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .cc-reveal {
+        animation-timeline: view();
+        animation-range: entry 0% cover 20%;
+      }
+    }
+  }
+
+  /* Rows and cards that are also links: lift under the cursor, settle on press. */
+  .cc-lift {
+    transition:
+      transform var(--motion-fast) var(--ease-out-soft),
+      box-shadow var(--motion-fast) var(--ease-out-soft),
+      border-color var(--motion-fast) var(--ease-out-soft),
+      background-color var(--motion-fast) var(--ease-out-soft);
+  }
+  .cc-lift:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in oklch, var(--primary) 32%, var(--border));
+    box-shadow: 0 10px 26px -14px
+      color-mix(in oklch, var(--foreground) 30%, transparent);
+  }
+  .cc-lift:active {
+    transform: translateY(0);
+  }
+
+  @keyframes cc-blur-rise {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 18px, 0);
+      filter: blur(10px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+      filter: blur(0);
+    }
+  }
+
+  /* The hero's light. Two blurred fields drifting out of phase read as a live
+     surface rather than a static gradient; they are slow enough not to pull
+     the eye off the headline. */
+  @keyframes cc-drift {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    50% {
+      transform: translate3d(4%, -5%, 0) scale(1.12);
+    }
+  }
+  @keyframes cc-drift-alt {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1.08);
+    }
+    50% {
+      transform: translate3d(-5%, 4%, 0) scale(0.94);
+    }
+  }
+
+  .cc-drift {
+    animation: cc-drift 19s ease-in-out infinite;
+  }
+  .cc-drift-alt {
+    animation: cc-drift-alt 24s ease-in-out infinite;
+  }
+
+  /* The status dot on the hero badge: a ring leaving the dot, not a blink. */
+  @keyframes cc-ping-soft {
+    0% {
+      transform: scale(1);
+      opacity: 0.65;
+    }
+    70%,
+    100% {
+      transform: scale(2.6);
+      opacity: 0;
+    }
+  }
+  .cc-ping::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: currentColor;
+    animation: cc-ping-soft 2.4s var(--ease-out-soft) infinite;
+  }
+
+  /* A light passing over a solid button on hover. Only legible on a filled
+     surface, so it goes on the primary calls to action and nowhere else. */
+  @keyframes cc-sheen {
+    from {
+      transform: translateX(-130%) skewX(-14deg);
+    }
+    to {
+      transform: translateX(260%) skewX(-14deg);
+    }
+  }
+  .cc-sheen {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .cc-sheen::after {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inline-size: 45%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklch, white 38%, transparent),
+      transparent
+    );
+    transform: translateX(-130%) skewX(-14deg);
+    pointer-events: none;
+  }
+  .cc-sheen:hover::after,
+  .cc-sheen:focus-visible::after {
+    animation: cc-sheen 900ms var(--ease-out-soft);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cc-rise,
+    .cc-fade,
+    .cc-pop,
+    .cc-reveal,
+    .cc-stagger > * {
+      animation: none;
+    }
+    .cc-lift,
+    .cc-lift:hover,
+    .cc-lift:active {
+      transform: none;
+      transition: none;
+    }
+    .cc-drift,
+    .cc-drift-alt,
+    .cc-ping::after,
+    .cc-sheen:hover::after,
+    .cc-sheen:focus-visible::after {
+      animation: none;
+    }
+    /* Without the ring the dot is still a dot; without this it is a blob. */
+    .cc-ping::after {
+      display: none;
+    }
+  }
 }
