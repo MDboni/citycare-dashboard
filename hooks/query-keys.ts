@@ -16,6 +16,14 @@ export const queryKeys = {
   me: ["me"] as const,
   sessions: ["auth", "sessions"] as const,
 
+  access: {
+    all: ["access"] as const,
+    mine: ["access", "mine"] as const,
+    permissions: ["access", "permissions"] as const,
+    roles: ["access", "roles"] as const,
+    userRoles: (id: string) => ["access", "user-roles", id] as const,
+  },
+
   catalog: {
     departments: ["catalog", "departments"] as const,
     categories: ["catalog", "categories"] as const,

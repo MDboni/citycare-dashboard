@@ -38,7 +38,11 @@ export const routes = {
   oversight: {
     auditLogs: "/oversight/audit-logs",
     securityEvents: "/oversight/security-events",
-    settings: "/oversight/settings",
+  },
+
+  settings: {
+    system: "/settings",
+    access: "/settings/access",
   },
 
   account: "/account",

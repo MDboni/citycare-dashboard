@@ -7,9 +7,11 @@ import {
   FileTextIcon,
   GaugeIcon,
   LayersIcon,
+  LogOutIcon,
   MapIcon,
   ScrollTextIcon,
   ShieldAlertIcon,
+  ShieldCheckIcon,
   SlidersHorizontalIcon,
   TagIcon,
   TrendingUpIcon,
@@ -143,12 +145,26 @@ const GROUPS: NavGroup[] = [
         roles: ["ADMIN"],
         superAdminOnly: true,
       },
+    ],
+  },
+  {
+    label: "Settings",
+    items: [
       {
-        href: routes.oversight.settings,
-        label: "Settings",
+        href: routes.settings.system,
+        label: "System",
         icon: SlidersHorizontalIcon,
         roles: ["ADMIN"],
         superAdminOnly: true,
+      },
+      {
+        href: routes.settings.access,
+        label: "Access",
+        icon: ShieldCheckIcon,
+        roles: ["ADMIN"],
+        // No superAdminOnly: an admin who has been GIVEN access_control__*
+        // should reach it. The page itself hides the tabs they cannot use, and
+        // the API refuses regardless.
       },
     ],
   },
@@ -161,7 +177,7 @@ const isActive = (pathname: string, href: string) =>
 
 export function ConsoleSidebar() {
   const pathname = usePathname();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
 
   const role = user?.role;
   const visible = (item: NavItem) => {
@@ -225,6 +241,18 @@ export function ConsoleSidebar() {
 
       <SidebarFooter>
         <SidebarSeparator />
+
+        {/* Who is signed in, spelled out. The header has an avatar menu too,
+            but a sign-out worth finding should not be two clicks inside one. */}
+        {user && (
+          <div className="min-w-0 px-2 py-1 group-data-[collapsible=icon]:hidden">
+            <p className="truncate text-sm font-medium">{user.name}</p>
+            <p className="truncate text-xs text-muted-foreground">
+              {user.email}
+            </p>
+          </div>
+        )}
+
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
@@ -234,6 +262,19 @@ export function ConsoleSidebar() {
             >
               <UserCogIcon />
               <span>Your account</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              tooltip="Sign out"
+              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+              onClick={() => {
+                void signOut();
+              }}
+            >
+              <LogOutIcon />
+              <span>Sign out</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

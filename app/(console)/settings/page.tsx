@@ -10,7 +10,6 @@ import { toast } from "sonner";
 import { AdminOnly } from "@/components/layout/role-gate";
 import { ErrorState } from "@/components/shared/error-state";
 import { TableSkeleton } from "@/components/shared/loading";
-import { PageHeader } from "@/components/shared/page-header";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -78,6 +77,8 @@ const COPY: Record<
 };
 
 export default function SettingsPage() {
+  // Editing a setting is super-admin only on the API, so the screen says so
+  // rather than letting an admin fill in a form that will 403 on save.
   return (
     <AdminOnly superAdmin>
       <SettingsView />
@@ -89,12 +90,7 @@ function SettingsView() {
   const { data, isPending, isError, error, refetch } = useSystemSettings();
 
   return (
-    <div className="space-y-6 p-4 sm:p-6">
-      <PageHeader
-        title="System settings"
-        description="Runtime knobs that take effect without a deploy. Each change is written to the audit log."
-      />
-
+    <div className="space-y-6">
       <Alert>
         <SlidersHorizontalIcon />
         <AlertTitle>These are live values</AlertTitle>
