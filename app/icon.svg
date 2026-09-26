@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="CityCare">
+  <title>CityCare</title>
+  <!-- Same geometry as LogoMark in components/shared/logo.tsx. The colours are
+       literal because a static icon file cannot read a CSS variable: #006eb1 is
+       oklch(0.52 0.135 245), the primary token, and this is a step either side of it. -->
+  <defs>
+    <linearGradient id="cc-tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b78bd" />
+      <stop offset="1" stop-color="#065396" />
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="7" fill="url(#cc-tile)" />
+  <g transform="translate(1.86 2.67) scale(1.18)">
+    <path
+      fill="#ffffff"
+      fill-rule="evenodd"
+      d="M12 2.4c-3.75 0-6.8 3.02-6.8 6.75 0 2.35 1.34 4.86 2.77 6.83a28 28 0 0 0 3.32 3.79c.4.38 1.02.38 1.42 0a28 28 0 0 0 3.32-3.79c1.43-1.97 2.77-4.48 2.77-6.83C18.8 5.42 15.75 2.4 12 2.4Zm0 9.5a2.62 2.62 0 1 1 0-5.25 2.62 2.62 0 0 1 0 5.25Z"
+    />
+  </g>
+</svg>
