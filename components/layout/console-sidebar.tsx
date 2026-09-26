@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { PermissionGate } from "@/components/layout/permission-gate";
 import { LogoMark } from "@/components/shared/logo";
 import {
   Sidebar,
@@ -45,6 +46,12 @@ type NavItem = {
   /** Which roles see the link. Absent means every signed-in role. */
   roles?: Role[];
   superAdminOnly?: boolean;
+  /**
+   * Hide the link unless the viewer holds this permission. Only worth setting
+   * where a role alone is not the answer — Access is reachable by any admin who
+   * has been granted it, not only by a super admin.
+   */
+  permission?: string;
 };
 
 type NavGroup = { label: string; items: NavItem[] };
@@ -162,9 +169,10 @@ const GROUPS: NavGroup[] = [
         label: "Access",
         icon: ShieldCheckIcon,
         roles: ["ADMIN"],
-        // No superAdminOnly: an admin who has been GIVEN access_control__*
-        // should reach it. The page itself hides the tabs they cannot use, and
-        // the API refuses regardless.
+        // Not superAdminOnly: an admin who has been GIVEN access_control__*
+        // should reach it. The page hides the tabs they cannot use and the API
+        // refuses regardless, so this only keeps a dead link out of the nav.
+        permission: "access_control__manage_users",
       },
     ],
   },
@@ -220,18 +228,38 @@ export function ConsoleSidebar() {
               <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  {items.map((item) => (
-                    <SidebarMenuItem key={item.href}>
-                      <SidebarMenuButton
-                        isActive={isActive(pathname, item.href)}
-                        tooltip={item.label}
-                        render={<Link href={item.href} />}
+                  {items.map((item) => {
+                    const link = (
+                      <SidebarMenuItem key={item.href}>
+                        <SidebarMenuButton
+                          isActive={isActive(pathname, item.href)}
+                          tooltip={item.label}
+                          render={<Link href={item.href} />}
+                        >
+                          <item.icon />
+                          <span>{item.label}</span>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+
+                    // fallback={null} so a nav item the viewer lacks simply is
+                    // not there, rather than leaving a refusal card in the menu.
+                    return item.permission ? (
+                      <PermissionGate
+                        key={item.href}
+                        permission={[
+                          item.permission,
+                          "access_control__manage_roles",
+                          "access_control__manage_permissions",
+                        ]}
+                        fallback={null}
                       >
-                        <item.icon />
-                        <span>{item.label}</span>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
+                        {link}
+                      </PermissionGate>
+                    ) : (
+                      link
+                    );
+                  })}
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>

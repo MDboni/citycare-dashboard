@@ -1,22 +1,80 @@
 "use client";
 
-import { KeyRoundIcon, ShieldCheckIcon, UsersIcon } from "lucide-react";
+import {
+  KeyRoundIcon,
+  ShieldCheckIcon,
+  ShieldXIcon,
+  UsersIcon,
+} from "lucide-react";
+import { useState } from "react";
 import { PermissionsTab } from "@/components/access/permissions-tab";
 import { RolesTab } from "@/components/access/roles-tab";
 import { UserRolesTab } from "@/components/access/user-roles-tab";
-import { PermissionGate } from "@/components/layout/permission-gate";
+import { EmptyState } from "@/components/shared/empty-state";
+import { CardGridSkeleton } from "@/components/shared/loading";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usePermission } from "@/hooks";
 
 /**
- * Access control, in the order the three ideas actually stack up: a permission
- * is a thing you may do, a role is a bundle of them, and a user holds roles.
- * The tabs read left to right as users → roles → permissions because that is
- * the order someone arrives with a question ("why can't Karim do X?").
+ * Access control, in the order the three ideas stack up: a permission is a
+ * thing you may do, a role is a bundle of them, and a user holds roles. The
+ * tabs read users → roles → permissions because that is the order someone
+ * arrives with a question ("why can't Karim do X?").
  */
+const TABS = [
+  {
+    value: "users",
+    label: "Users",
+    icon: UsersIcon,
+    permission: "access_control__manage_users",
+  },
+  {
+    value: "roles",
+    label: "Roles",
+    icon: ShieldCheckIcon,
+    permission: "access_control__manage_roles",
+  },
+  {
+    value: "permissions",
+    label: "Permissions",
+    icon: KeyRoundIcon,
+    permission: "access_control__manage_permissions",
+  },
+] as const;
+
 export function AccessView() {
-  const { can, isSuperAdmin } = usePermission();
+  const { can, isLoading, isSuperAdmin } = usePermission();
+  const [selected, setSelected] = useState<string | null>(null);
+
+  /**
+   * Nothing renders until the permission query settles.
+   *
+   * The tab strip is built out of what this viewer may use, and `can()` answers
+   * false while it is still loading — so mounting early would show one set of
+   * tabs and then swap it, which is exactly what Base UI warns about when an
+   * uncontrolled default changes underneath it.
+   */
+  if (isLoading) return <CardGridSkeleton count={2} />;
+
+  const allowed = TABS.filter((tab) => can(tab.permission));
+
+  if (allowed.length === 0) {
+    return (
+      <EmptyState
+        icon={ShieldXIcon}
+        title="You do not have access to this screen"
+        description="Managing roles and permissions needs one of the access control permissions. Ask a super admin."
+      />
+    );
+  }
+
+  // Controlled, and never pointed at a tab this viewer cannot see — a stale
+  // selection after a permission change would otherwise render a blank panel.
+  const active =
+    selected && allowed.some((tab) => tab.value === selected)
+      ? selected
+      : allowed[0].value;
 
   return (
     <div className="space-y-5">
@@ -33,57 +91,37 @@ export function AccessView() {
       </Alert>
 
       <Tabs
-        defaultValue={can("access_control__manage_users") ? "users" : "roles"}
+        value={active}
+        onValueChange={(value) => setSelected(String(value))}
       >
         <TabsList>
-          <PermissionGate
-            permission="access_control__manage_users"
-            fallback={null}
-          >
-            <TabsTrigger value="users">
-              <UsersIcon data-icon="inline-start" />
-              Users
+          {allowed.map((tab) => (
+            <TabsTrigger key={tab.value} value={tab.value}>
+              <tab.icon data-icon="inline-start" />
+              {tab.label}
             </TabsTrigger>
-          </PermissionGate>
-          <PermissionGate
-            permission="access_control__manage_roles"
-            fallback={null}
-          >
-            <TabsTrigger value="roles">
-              <ShieldCheckIcon data-icon="inline-start" />
-              Roles
-            </TabsTrigger>
-          </PermissionGate>
-          <PermissionGate
-            permission="access_control__manage_permissions"
-            fallback={null}
-          >
-            <TabsTrigger value="permissions">
-              <KeyRoundIcon data-icon="inline-start" />
-              Permissions
-            </TabsTrigger>
-          </PermissionGate>
+          ))}
         </TabsList>
 
-        <TabsContent value="users" className="mt-4">
-          <PermissionGate permission="access_control__manage_users">
+        {allowed.some((tab) => tab.value === "users") && (
+          <TabsContent value="users" className="mt-4">
             <UserRolesTab />
-          </PermissionGate>
-        </TabsContent>
+          </TabsContent>
+        )}
 
-        <TabsContent value="roles" className="mt-4">
-          <PermissionGate permission="access_control__manage_roles">
+        {allowed.some((tab) => tab.value === "roles") && (
+          <TabsContent value="roles" className="mt-4">
             <RolesTab
               canEdit={isSuperAdmin || can("access_control__manage_roles")}
             />
-          </PermissionGate>
-        </TabsContent>
+          </TabsContent>
+        )}
 
-        <TabsContent value="permissions" className="mt-4">
-          <PermissionGate permission="access_control__manage_permissions">
+        {allowed.some((tab) => tab.value === "permissions") && (
+          <TabsContent value="permissions" className="mt-4">
             <PermissionsTab />
-          </PermissionGate>
-        </TabsContent>
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );
