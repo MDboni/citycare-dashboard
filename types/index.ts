@@ -3,6 +3,7 @@ export * from "./api.types";
 export * from "./auth.types";
 export * from "./catalog.types";
 export * from "./complaint.types";
+export * from "./contact.types";
 export * from "./enums.types";
 export * from "./rbac.types";
 export * from "./service.types";

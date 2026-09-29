@@ -6,6 +6,7 @@ import {
   DatabaseIcon,
   FileTextIcon,
   GaugeIcon,
+  InboxIcon,
   LayersIcon,
   LogOutIcon,
   MapIcon,
@@ -138,6 +139,13 @@ const GROUPS: NavGroup[] = [
         label: "SLA report",
         icon: TrendingUpIcon,
         roles: ["ADMIN"],
+      },
+      {
+        href: routes.oversight.messages,
+        label: "Messages",
+        icon: InboxIcon,
+        roles: ["ADMIN"],
+        permission: "contact__manage_messages",
       },
       {
         href: routes.oversight.auditLogs,

@@ -36,6 +36,7 @@ export const routes = {
   },
 
   oversight: {
+    messages: "/oversight/messages",
     auditLogs: "/oversight/audit-logs",
     securityEvents: "/oversight/security-events",
   },

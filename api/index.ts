@@ -8,6 +8,7 @@ export {
 export { authApi } from "./auth.api";
 export { catalogApi } from "./catalog.api";
 export { type ComplaintFilters, complaintsApi } from "./complaints.api";
+export { type ContactMessageFilters, contactApi } from "./contact.api";
 export { notificationsApi } from "./notifications.api";
 export { paymentsApi } from "./payments.api";
 export { rbacApi } from "./rbac.api";
