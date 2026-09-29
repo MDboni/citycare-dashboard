@@ -3,7 +3,11 @@ import type { Priority } from "./enums.types";
 export type Department = {
   id: string;
   name: string;
+  /** The escalation inbox for a breached complaint. */
   email: string | null;
+  /** Published on the public contact page. Both optional. */
+  phone: string | null;
+  address: string | null;
   createdAt: string;
   updatedAt: string;
 };

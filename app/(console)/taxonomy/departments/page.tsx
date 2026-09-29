@@ -21,6 +21,10 @@ import type { Department } from "@/types";
 const schema = z.object({
   name: z.string().trim().min(2, "Name it").max(80, "Too long"),
   email: z.email("Enter a valid email").max(254).optional().or(z.literal("")),
+  // Loose on purpose: a municipal desk writes its number with a country code,
+  // an extension or neither, and rejecting any of those helps nobody.
+  phone: z.string().trim().max(30, "Too long").optional().or(z.literal("")),
+  address: z.string().trim().max(200, "Too long").optional().or(z.literal("")),
 });
 
 type Values = z.infer<typeof schema>;
@@ -33,7 +37,7 @@ export default function DepartmentsPage() {
 
   const form = useForm<Values>({
     resolver: zodResolver(schema),
-    defaultValues: { name: "", email: "" },
+    defaultValues: { name: "", email: "", phone: "", address: "" },
   });
 
   const onCreate = form.handleSubmit(async (values) => {
@@ -41,6 +45,8 @@ export default function DepartmentsPage() {
       await create.mutateAsync({
         name: values.name,
         ...(values.email ? { email: values.email } : {}),
+        ...(values.phone ? { phone: values.phone } : {}),
+        ...(values.address ? { address: values.address } : {}),
       });
       toast.success(`${values.name} added.`);
       form.reset();
@@ -56,7 +62,7 @@ export default function DepartmentsPage() {
   return (
     <CrudShell<Department>
       title="New department"
-      description="A department owns categories, and an officer belongs to exactly one. The email is where SLA escalation notices go."
+      description="A department owns categories, and an officer belongs to exactly one. The escalation email is where breached complaints go; the desk phone and address are published on the public contact page."
       rows={departments.data ?? []}
       isPending={departments.isPending}
       isError={departments.isError}
@@ -113,6 +119,23 @@ export default function DepartmentsPage() {
             register={form.register}
             error={form.formState.errors.email}
           />
+          <TextField
+            name="phone"
+            label="Desk phone"
+            inputMode="tel"
+            placeholder="+880 2 5566 0101"
+            description="Optional. Shown on the public contact page."
+            register={form.register}
+            error={form.formState.errors.phone}
+          />
+          <TextField
+            name="address"
+            label="Desk address"
+            placeholder="Roads Division, Nagar Bhaban, Dhaka 1000"
+            description="Optional. Shown on the public contact page."
+            register={form.register}
+            error={form.formState.errors.address}
+          />
           <CreateSubmit
             isSubmitting={form.formState.isSubmitting}
             label="Add department"
@@ -146,7 +169,12 @@ function EditDepartmentForm({
 }) {
   const form = useForm<Values>({
     resolver: zodResolver(schema),
-    defaultValues: { name: row.name, email: row.email ?? "" },
+    defaultValues: {
+      name: row.name,
+      email: row.email ?? "",
+      phone: row.phone ?? "",
+      address: row.address ?? "",
+    },
   });
 
   const onSubmit = form.handleSubmit(async (values) => {
@@ -155,6 +183,8 @@ function EditDepartmentForm({
         id: row.id,
         name: values.name,
         ...(values.email ? { email: values.email } : {}),
+        ...(values.phone ? { phone: values.phone } : {}),
+        ...(values.address ? { address: values.address } : {}),
       });
       toast.success("Department updated.");
       close();
@@ -183,6 +213,21 @@ function EditDepartmentForm({
         inputMode="email"
         register={form.register}
         error={form.formState.errors.email}
+      />
+      <TextField
+        name="phone"
+        label="Desk phone"
+        inputMode="tel"
+        description="Shown on the public contact page."
+        register={form.register}
+        error={form.formState.errors.phone}
+      />
+      <TextField
+        name="address"
+        label="Desk address"
+        description="Shown on the public contact page."
+        register={form.register}
+        error={form.formState.errors.address}
       />
       <div className="flex justify-end gap-2">
         <Button type="button" variant="ghost" onClick={close}>
