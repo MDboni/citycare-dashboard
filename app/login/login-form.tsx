@@ -3,15 +3,22 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2Icon, ShieldCheckIcon } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { AuthCard } from "@/components/auth/auth-card";
+import { DemoLoginPanel } from "@/components/auth/demo-login-panel";
 import { PasswordField, TextField } from "@/components/shared/form-fields";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { useLogin } from "@/hooks";
 import { toApiError } from "@/lib/api-error";
 import { saveChallenge } from "@/lib/challenge";
+import {
+  DEMO_ACCOUNTS,
+  DEMO_LOGINS_ENABLED,
+  type DemoRole,
+} from "@/lib/demo-accounts";
 import { useAuth } from "@/providers";
 import { routes } from "@/routes";
 import { type LoginValues, loginSchema } from "@/validation";
@@ -40,6 +47,9 @@ export function LoginForm() {
   });
 
   const next = searchParams.get("next") ?? routes.home;
+
+  /** Which demo button is mid-flight, so the others can grey out. */
+  const [pendingDemo, setPendingDemo] = useState<DemoRole | null>(null);
 
   const onSubmit = handleSubmit(async (values) => {
     try {
@@ -82,6 +92,63 @@ export function LoginForm() {
     }
   });
 
+  /**
+   * One click, no typing. Only staff sign in here — the panel sends the citizen
+   * button to the resident app, which owns that session.
+   */
+  const runDemo = useCallback(
+    async (role: DemoRole) => {
+      const account = DEMO_ACCOUNTS[role];
+      setPendingDemo(role);
+      try {
+        const result = await login.mutateAsync({
+          email: account.email,
+          password: account.password,
+        });
+
+        // The seeded demo staff have 2FA off; if one is ever turned on, the
+        // code screen is still the right landing place rather than a toast.
+        if (result.twoFactorRequired) {
+          saveChallenge({
+            kind: "login",
+            challengeId: result.challengeId,
+            email: result.email,
+            expiresInSec: result.expiresInSec,
+          });
+          router.push(`${routes.twoFactor}?next=${encodeURIComponent(next)}`);
+          return;
+        }
+
+        if (result.user.role === "CITIZEN") {
+          toast.error("That is a citizen account. Use the main CityCare site.");
+          return;
+        }
+
+        await signIn(result);
+        toast.success(`Signed in as ${account.label}.`);
+        router.replace(next);
+      } catch (error) {
+        toast.error(toApiError(error).message);
+      } finally {
+        setPendingDemo(null);
+      }
+    },
+    [login, next, router, signIn],
+  );
+
+  /**
+   * Arriving from the resident app's panel with `?demo=officer|admin`. The ref
+   * keeps a re-render from firing a second sign-in on top of the first.
+   */
+  const demoParam = searchParams.get("demo");
+  const autoRan = useRef(false);
+  useEffect(() => {
+    if (autoRan.current || !DEMO_LOGINS_ENABLED) return;
+    if (demoParam !== "officer" && demoParam !== "admin") return;
+    autoRan.current = true;
+    void runDemo(demoParam);
+  }, [demoParam, runDemo]);
+
   return (
     <AuthCard
       title="CityCare staff console"
@@ -119,6 +186,8 @@ export function LoginForm() {
           Sign in
         </Button>
       </form>
+
+      <DemoLoginPanel onDemo={runDemo} pending={pendingDemo} />
 
       <Alert>
         <ShieldCheckIcon />
