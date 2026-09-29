@@ -2,7 +2,7 @@
 
 import { ShieldAlertIcon } from "lucide-react";
 import type { ReactNode } from "react";
-import { FullPageSpinner } from "@/components/shared/loading";
+import { GridPageSkeleton } from "@/components/shared/loading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/providers";
@@ -29,8 +29,7 @@ export function RoleGate({
 }) {
   const { user, isLoading, signOut } = useAuth();
 
-  if (isLoading || !user)
-    return <FullPageSpinner label="Checking your access" />;
+  if (isLoading || !user) return <GridPageSkeleton count={4} />;
 
   if (!allow.includes(user.role)) {
     return (
@@ -76,8 +75,7 @@ export function AdminOnly({
 }) {
   const { user, isLoading } = useAuth();
 
-  if (isLoading || !user)
-    return <FullPageSpinner label="Checking your access" />;
+  if (isLoading || !user) return <GridPageSkeleton count={4} />;
 
   const allowed = user.role === "ADMIN" && (!superAdmin || user.isSuperAdmin);
 

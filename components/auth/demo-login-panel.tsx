@@ -1,3 +1,4 @@
+// biome-ignore-all lint/a11y/useAnchorContent: the one anchor here is a Base UI `render` target — Button supplies its children.
 "use client";
 
 import { ExternalLinkIcon, Loader2Icon, UserCheckIcon } from "lucide-react";
@@ -63,7 +64,6 @@ export function DemoLoginPanel({
            * ends up with both roles open side by side, which is what the
            * walkthrough wants anyway.
            */
-          // biome-ignore lint/a11y/useAnchorContent: Button supplies the children to the element it renders.
           const link = (
             <a
               href={href}

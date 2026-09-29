@@ -1,6 +1,6 @@
 "use client";
 
-import { FullPageSpinner } from "@/components/shared/loading";
+import { GridPageSkeleton } from "@/components/shared/loading";
 import { useAuth } from "@/providers";
 import { AdminOverview } from "./admin-overview";
 import { OfficerOverview } from "./officer-overview";
@@ -13,8 +13,7 @@ import { OfficerOverview } from "./officer-overview";
 export default function ConsoleHomePage() {
   const { user, isLoading } = useAuth();
 
-  if (isLoading || !user)
-    return <FullPageSpinner label="Loading your overview" />;
+  if (isLoading || !user) return <GridPageSkeleton count={4} />;
 
   return user.role === "ADMIN" ? <AdminOverview /> : <OfficerOverview />;
 }

@@ -14,7 +14,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { ErrorState } from "@/components/shared/error-state";
 import { PasswordField, TextField } from "@/components/shared/form-fields";
-import { FullPageSpinner, TableSkeleton } from "@/components/shared/loading";
+import { FormPageSkeleton, TableSkeleton } from "@/components/shared/loading";
 import { PageHeader } from "@/components/shared/page-header";
 import { RolePill, UserStatusPill } from "@/components/shared/status-pill";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -52,8 +52,7 @@ import {
 export default function AccountPage() {
   const { user, isLoading } = useAuth();
 
-  if (isLoading || !user)
-    return <FullPageSpinner label="Loading your account" />;
+  if (isLoading || !user) return <FormPageSkeleton fields={5} />;
 
   return (
     <div className="space-y-6 p-4 sm:p-6">

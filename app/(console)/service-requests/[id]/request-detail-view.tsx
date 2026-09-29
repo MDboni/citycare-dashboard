@@ -13,7 +13,7 @@ import { DocumentList } from "@/components/services/document-list";
 import { RefundPanel } from "@/components/services/refund-panel";
 import { CopyButton } from "@/components/shared/copy-button";
 import { ErrorState } from "@/components/shared/error-state";
-import { FullPageSpinner } from "@/components/shared/loading";
+import { DetailPageSkeleton } from "@/components/shared/loading";
 import { ServiceRequestStatusPill } from "@/components/shared/status-pill";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -61,7 +61,7 @@ export function RequestDetailView({ id }: { id: string }) {
   const [pending, setPending] = useState<(typeof MOVES)[number] | null>(null);
   const [note, setNote] = useState("");
 
-  if (isPending) return <FullPageSpinner label="Loading application" />;
+  if (isPending) return <DetailPageSkeleton />;
 
   if (isError) {
     return (

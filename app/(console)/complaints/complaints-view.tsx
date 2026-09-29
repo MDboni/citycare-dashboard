@@ -11,7 +11,7 @@ import { ComplaintsTable } from "@/components/complaints/complaints-table";
 import { DataPagination } from "@/components/shared/data-pagination";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ErrorState } from "@/components/shared/error-state";
-import { FullPageSpinner, TableSkeleton } from "@/components/shared/loading";
+import { ListPageSkeleton, TableSkeleton } from "@/components/shared/loading";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -44,7 +44,7 @@ export function ComplaintsView() {
   const assigned = useAssignedComplaints(query);
   const active = mineOnly ? assigned : all;
 
-  if (isLoading) return <FullPageSpinner label="Loading complaints" />;
+  if (isLoading) return <ListPageSkeleton rows={8} columns={5} />;
 
   const complaints = active.data?.items ?? [];
 

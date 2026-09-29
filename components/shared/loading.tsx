@@ -12,14 +12,12 @@ export function Spinner({ className }: { className?: string }) {
   );
 }
 
-export function FullPageSpinner({ label = "Loading" }: { label?: string }) {
-  return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
-      <Spinner className="size-6" />
-      <p className="text-sm text-muted-foreground">{label}...</p>
-    </div>
-  );
-}
+/*
+ * There is deliberately no full-page spinner here. A blank screen with a
+ * turning circle tells someone nothing about what is coming; the page-shaped
+ * skeletons below do, and they hold the layout so nothing jumps when the data
+ * lands. Spinner above is for inside a button, where the shape is the point.
+ */
 
 /**
  * Matches the row height of the tables, so nothing jumps when data lands.
