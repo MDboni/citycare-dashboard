@@ -34,8 +34,8 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuHeader,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -355,7 +355,7 @@ function UserRow({ row, isMe }: { row: AdminUser; isMe: boolean }) {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>{row.name}</DropdownMenuLabel>
+              <DropdownMenuHeader>{row.name}</DropdownMenuHeader>
               <DropdownMenuSeparator />
 
               <DropdownMenuItem

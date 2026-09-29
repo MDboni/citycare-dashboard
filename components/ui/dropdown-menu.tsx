@@ -75,6 +75,29 @@ function DropdownMenuLabel({
   );
 }
 
+/**
+ * A plain heading at the top of a menu — the signed-in identity, or the row an
+ * action list belongs to.
+ *
+ * Deliberately not `DropdownMenuLabel`. That one is Base UI's
+ * `Menu.GroupLabel`, which throws outside a `Menu.Group` and, when you do wrap
+ * one around it, names the group for a screen reader. "Profile, Security,
+ * Devices" labelled "Karim karim@example.com Citizen" is a worse announcement
+ * than no label at all. A header is not a label; this renders as what it is.
+ */
+function DropdownMenuHeader({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="dropdown-menu-header"
+      className={cn("px-1.5 py-1 text-xs font-medium", className)}
+      {...props}
+    />
+  );
+}
+
 function DropdownMenuItem({
   className,
   inset,
@@ -259,6 +282,7 @@ export {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuLabel,
+  DropdownMenuHeader,
   DropdownMenuItem,
   DropdownMenuCheckboxItem,
   DropdownMenuRadioGroup,

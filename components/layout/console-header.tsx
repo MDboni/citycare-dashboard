@@ -10,8 +10,8 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuHeader,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -92,7 +92,7 @@ export function ConsoleHeader() {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end" className="w-60">
-              <DropdownMenuLabel className="space-y-1.5 px-2 py-2 text-foreground">
+              <DropdownMenuHeader className="space-y-1.5 px-2 py-2 text-foreground">
                 <p className="truncate text-sm font-medium">{user.name}</p>
                 <p className="truncate text-xs font-normal text-muted-foreground">
                   {user.email}
@@ -101,7 +101,7 @@ export function ConsoleHeader() {
                   <RolePill role={user.role} />
                   {user.isSuperAdmin && <Badge>Super admin</Badge>}
                 </span>
-              </DropdownMenuLabel>
+              </DropdownMenuHeader>
 
               <DropdownMenuSeparator />
 
