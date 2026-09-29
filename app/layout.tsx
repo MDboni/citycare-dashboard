@@ -25,6 +25,17 @@ export const metadata: Metadata = {
   applicationName: "CityCare console",
   // A private console has nothing to gain from being indexed.
   robots: { index: false, follow: false },
+  /**
+   * Tells Dark Reader to leave the page alone.
+   *
+   * CityCare ships its own dark theme through next-themes, so the extension
+   * has nothing to add — it only re-tints a palette that is already correct.
+   * It was also rewriting the stroke on every icon between the server render
+   * and hydration, which React reports as a hydration mismatch it cannot
+   * patch up. This is the opt-out Dark Reader documents for sites that theme
+   * themselves; it is a statement about this site, not a silenced warning.
+   */
+  other: { "darkreader-lock": "true" },
 };
 
 export const viewport: Viewport = {
