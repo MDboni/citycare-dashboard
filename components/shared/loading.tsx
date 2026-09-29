@@ -16,7 +16,8 @@ export function Spinner({ className }: { className?: string }) {
  * There is deliberately no full-page spinner here. A blank screen with a
  * turning circle tells someone nothing about what is coming; the page-shaped
  * skeletons below do, and they hold the layout so nothing jumps when the data
- * lands. Spinner above is for inside a button, where the shape is the point.
+ * lands. Spinner above is the small one, for inside a button or beside a
+ * label, where a shape-matched skeleton would be sillier than a turning circle.
  */
 
 /**
