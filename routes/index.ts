@@ -18,6 +18,10 @@ export const routes = {
     detail: (id: string) => `/service-requests/${id}`,
   },
 
+  payments: {
+    ledger: "/payments",
+  },
+
   people: {
     users: "/people/users",
     staff: "/people/staff",

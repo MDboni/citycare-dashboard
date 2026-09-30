@@ -35,6 +35,26 @@ export const formatBdt = (amount: string | number | null | undefined) => {
   }).format(value);
 };
 
+/**
+ * The same figure, short enough for a chart axis: ৳5.1K, ৳4.5M.
+ *
+ * Only ever for an axis or a tick. A total somebody might key into a
+ * spreadsheet gets `formatBdt`, in full — a rounded number in a box labelled
+ * "collected" is how a page about money stops being trusted.
+ */
+export const formatBdtShort = (amount: string | number | null | undefined) => {
+  if (amount === null || amount === undefined || amount === "") return "—";
+  const value = Number(amount);
+  if (Number.isNaN(value)) return String(amount);
+  return new Intl.NumberFormat("en-BD", {
+    style: "currency",
+    currency: "BDT",
+    currencyDisplay: "narrowSymbol",
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(value);
+};
+
 export const formatNumber = (value: number | null | undefined) =>
   value === null || value === undefined
     ? "—"

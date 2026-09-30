@@ -28,12 +28,15 @@ export function ChartCard({
   description,
   data,
   valueLabel = "Count",
+  /** Matches whatever the chart inside is formatting its values with. */
+  formatValue = formatNumber,
   children,
 }: {
   title: string;
   description?: string;
   data: CountDatum[];
   valueLabel?: string;
+  formatValue?: (value: number) => string;
   children: ReactNode;
 }) {
   const [asTable, setAsTable] = useState(false);
@@ -82,7 +85,7 @@ export function ChartCard({
                 <TableRow key={row.label}>
                   <TableCell>{row.label}</TableCell>
                   <TableCell className="text-right tabular-nums">
-                    {formatNumber(row.count)}
+                    {formatValue(row.count)}
                   </TableCell>
                   <TableCell className="text-right tabular-nums text-muted-foreground">
                     {total ? `${((row.count / total) * 100).toFixed(1)}%` : "—"}

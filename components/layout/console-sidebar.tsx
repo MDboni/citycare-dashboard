@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  BanknoteIcon,
   BuildingIcon,
   ClipboardListIcon,
   DatabaseIcon,
@@ -53,6 +54,13 @@ type NavItem = {
    * has been granted it, not only by a super admin.
    */
   permission?: string;
+  /**
+   * Other permissions that also open the link. It used to be one hardcoded pair
+   * applied to every gated item, which was right for Access and wrong for
+   * anything else: whoever can hand out roles would have been shown a Payments
+   * link that answers 403.
+   */
+  orPermission?: string[];
 };
 
 type NavGroup = { label: string; items: NavItem[] };
@@ -76,6 +84,19 @@ const GROUPS: NavGroup[] = [
         href: routes.serviceRequests.list,
         label: "Service requests",
         icon: FileTextIcon,
+      },
+    ],
+  },
+  {
+    label: "Money",
+    items: [
+      {
+        href: routes.payments.ledger,
+        label: "Payments",
+        icon: BanknoteIcon,
+        roles: ["ADMIN"],
+        // An admin can have this taken off them; the API refuses either way.
+        permission: "payments__view_all",
       },
     ],
   },
@@ -181,6 +202,10 @@ const GROUPS: NavGroup[] = [
         // should reach it. The page hides the tabs they cannot use and the API
         // refuses regardless, so this only keeps a dead link out of the nav.
         permission: "access_control__manage_users",
+        orPermission: [
+          "access_control__manage_roles",
+          "access_control__manage_permissions",
+        ],
       },
     ],
   },
@@ -257,8 +282,7 @@ export function ConsoleSidebar() {
                         key={item.href}
                         permission={[
                           item.permission,
-                          "access_control__manage_roles",
-                          "access_control__manage_permissions",
+                          ...(item.orPermission ?? []),
                         ]}
                         fallback={null}
                       >

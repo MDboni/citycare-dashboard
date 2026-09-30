@@ -10,7 +10,7 @@ export { catalogApi } from "./catalog.api";
 export { type ComplaintFilters, complaintsApi } from "./complaints.api";
 export { type ContactMessageFilters, contactApi } from "./contact.api";
 export { notificationsApi } from "./notifications.api";
-export { paymentsApi } from "./payments.api";
+export { type PaymentLedgerFilters, paymentsApi } from "./payments.api";
 export { rbacApi } from "./rbac.api";
 export { type ServiceRequestFilters, serviceRequestsApi } from "./services.api";
 export { taxonomyApi } from "./taxonomy.api";

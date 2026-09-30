@@ -3,6 +3,7 @@ import type {
   AuditLogFilters,
   ComplaintFilters,
   ContactMessageFilters,
+  PaymentLedgerFilters,
   SecurityEventFilters,
   ServiceRequestFilters,
 } from "@/api";
@@ -89,4 +90,9 @@ export const adminKeys = {
     ["admin", "contact-messages", filters] as const,
   slaReport: ["admin", "reports", "sla"] as const,
   settings: ["admin", "settings"] as const,
+  allPayments: ["admin", "payments"] as const,
+  paymentLedger: (filters: PaymentLedgerFilters) =>
+    ["admin", "payments", "ledger", filters] as const,
+  paymentSummary: (filters: PaymentLedgerFilters) =>
+    ["admin", "payments", "summary", filters] as const,
 } as const;

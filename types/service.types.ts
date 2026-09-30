@@ -122,3 +122,66 @@ export type Notification = {
   meta: Record<string, unknown> | null;
   createdAt: string;
 };
+
+/**
+ * A money figure, as the API sends it.
+ *
+ * `amount` is a decimal string and stays one all the way to the formatter.
+ * The API sums in the database precisely so that nothing in a browser has to
+ * add up a column of floats, and typing it as `number` here would invite
+ * exactly that.
+ */
+export type MoneyTotal = { count: number; amount: string };
+
+/** `GET /payments/admin` — one row of the staff ledger. */
+export type PaymentLedgerRow = {
+  id: string;
+  transactionId: string;
+  amount: string;
+  currency: string;
+  status: PaymentStatus;
+  gateway: string;
+  paidAt: string | null;
+  createdAt: string;
+  user: { id: string; name: string; email: string };
+  /** Required in the database: a payment is always against a request. */
+  serviceRequest: {
+    id: string;
+    referenceNo: string;
+    serviceType: { id: string; name: string };
+  };
+  refund: {
+    status: RefundStatus;
+    amount: string;
+    processedAt: string | null;
+  } | null;
+};
+
+/**
+ * `GET /payments/admin/summary` — the books.
+ *
+ * `totals` answers the current filter. `today`, `month` and `allTime` ignore it
+ * deliberately, so a date range cannot quietly rewrite a figure labelled today.
+ */
+export type PaymentSummary = {
+  totals: {
+    collected: MoneyTotal;
+    pending: MoneyTotal;
+    failed: MoneyTotal;
+    cancelled: MoneyTotal;
+    refunded: MoneyTotal;
+    /** Collected minus refunded — what the city is actually holding. */
+    net: string;
+  };
+  today: MoneyTotal;
+  month: MoneyTotal;
+  allTime: MoneyTotal;
+  byServiceType: {
+    serviceTypeId: string;
+    serviceType: string;
+    count: number;
+    amount: string;
+  }[];
+  /** Settled money per day. Only days with money in them are returned. */
+  daily: { date: string; count: number; amount: string }[];
+};

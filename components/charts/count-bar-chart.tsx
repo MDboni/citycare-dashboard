@@ -29,11 +29,14 @@ export function CountBarChart({
   label,
   /** A per-bar colour, for an ordered scale. Omitted, every bar is chart-1. */
   colors,
+  /** For a bar that carries money rather than a count of things. */
+  formatValue = formatNumber,
   height = 260,
 }: {
   data: CountDatum[];
   label: string;
   colors?: string[];
+  formatValue?: (value: number) => string;
   height?: number;
 }) {
   const config = {
@@ -70,7 +73,7 @@ export function CountBarChart({
           axisLine={false}
           tickMargin={6}
           tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
-          tickFormatter={(value: number) => formatNumber(value)}
+          tickFormatter={(value: number) => formatValue(value)}
           allowDecimals={false}
         />
 
@@ -107,7 +110,7 @@ export function CountBarChart({
             offset: 8,
             fill: "var(--foreground)",
             fontSize: 11,
-            formatter: (value: unknown) => formatNumber(Number(value)),
+            formatter: (value: unknown) => formatValue(Number(value)),
           }}
         >
           {/* An ordered scale paints each bar its own step of one hue; without

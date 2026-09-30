@@ -6,6 +6,7 @@ export * from "./use-catalog";
 export * from "./use-complaints";
 export * from "./use-contact";
 export * from "./use-notifications";
+export * from "./use-payments";
 export * from "./use-rbac";
 export * from "./use-services";
 export * from "./use-taxonomy";
