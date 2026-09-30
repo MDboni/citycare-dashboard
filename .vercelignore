@@ -1,0 +1,22 @@
+# The Vercel CLI does not read .gitignore, so a local `vercel` deploy would
+# happily upload the real .env. List the secrets here first.
+.env
+.env.*
+!.env.example
+
+# Vercel installs and builds from source; these are local artifacts and only
+# slow the upload down.
+node_modules
+.next
+tsconfig.tsbuildinfo
+*.log
+
+# Notes for humans and agents, read by nothing in the build.
+.claude
+.agents
+AGENTS.md
+CLAUDE.md
+
+# Deliberately NOT ignored:
+#   api/   — these are the API client modules the app imports (`@/api`), not
+#            serverless handlers. Ignoring them breaks the build's imports.
