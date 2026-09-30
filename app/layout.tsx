@@ -38,11 +38,15 @@ export const metadata: Metadata = {
   other: { "darkreader-lock": "true" },
 };
 
+/**
+ * One colour, not a pair behind prefers-color-scheme media queries.
+ *
+ * The console does not follow the operating system any more, so the OS is the
+ * wrong thing to ask. This is the light value, and ThemeEffects rewrites it
+ * when the theme is dark.
+ */
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#12161d" },
-  ],
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

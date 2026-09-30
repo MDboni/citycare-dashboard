@@ -1,51 +1,40 @@
 "use client";
 
-import { MonitorIcon, MoonIcon, SunIcon } from "lucide-react";
+import { MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
-const OPTIONS = [
-  { value: "light", label: "Light", icon: SunIcon },
-  { value: "dark", label: "Dark", icon: MoonIcon },
-  { value: "system", label: "System", icon: MonitorIcon },
-] as const;
-
+/**
+ * Light and dark, and nothing else.
+ *
+ * There used to be a third entry, System, and a dropdown to hold the three.
+ * Both are gone. The app no longer asks the operating system anything, so the
+ * only question left is which of two — and a menu is two clicks to answer a
+ * one-click question.
+ */
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  // The server cannot know the resolved theme, so the icon waits for the client
-  // rather than rendering the wrong one and swapping it.
+  // The server cannot know which theme is on, so the icon waits for the client
+  // rather than rendering the wrong one and swapping it. The label waits with
+  // it: an attribute that differs between the two renders is a hydration
+  // mismatch, and "Change theme" is true either way.
   useEffect(() => setMounted(true), []);
 
+  const dark = mounted && resolvedTheme === "dark";
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        render={
-          <Button variant="ghost" size="icon-sm" aria-label="Change theme" />
-        }
-      >
-        {mounted && theme === "dark" ? <MoonIcon /> : <SunIcon />}
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-36">
-        {OPTIONS.map((option) => (
-          <DropdownMenuItem
-            key={option.value}
-            onClick={() => setTheme(option.value)}
-            className={theme === option.value ? "bg-accent" : undefined}
-          >
-            <option.icon />
-            {option.label}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Button
+      variant="ghost"
+      size="icon-sm"
+      aria-label={
+        mounted ? `Switch to ${dark ? "light" : "dark"} theme` : "Change theme"
+      }
+      onClick={() => setTheme(dark ? "light" : "dark")}
+    >
+      {dark ? <MoonIcon /> : <SunIcon />}
+    </Button>
   );
 }
