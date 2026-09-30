@@ -228,6 +228,30 @@ export function MessagesView() {
   );
 }
 
+/**
+ * "Reply by email", as a mailto link wearing a button.
+ *
+ * Its own component so the anchor can be a single hoisted line: Base UI drops the
+ * Button's children into whatever `render` returns, but the linter only sees the
+ * empty `<a>` written here, and a suppression comment has to sit next to the node
+ * it is about — inside the prop the formatter moves it away from it.
+ */
+function ReplyByEmail({ message }: { message: ContactMessage }) {
+  const href = `mailto:${message.email}?subject=${encodeURIComponent(`Re: ${message.subject}`)}`;
+  const label = `Reply to ${message.name} by email`;
+  // The suppression only holds while this fits on one line — the formatter would
+  // otherwise wrap the element away from the comment and the comment goes stale.
+  // biome-ignore lint/a11y/useAnchorContent: the text is the Button's children, rendered into this anchor.
+  const anchor = <a href={href} aria-label={label} />;
+
+  return (
+    <Button variant="outline" size="sm" nativeButton={false} render={anchor}>
+      <MailIcon data-icon="inline-start" />
+      Reply by email
+    </Button>
+  );
+}
+
 function MessageDialog({
   message,
   onClose,
@@ -284,20 +308,7 @@ function MessageDialog({
               )}
             </div>
 
-            <Button
-              variant="outline"
-              size="sm"
-              nativeButton={false}
-              render={
-                <a
-                  href={`mailto:${message.email}?subject=${encodeURIComponent(`Re: ${message.subject}`)}`}
-                  aria-label={`Reply to ${message.name} by email`}
-                />
-              }
-            >
-              <MailIcon data-icon="inline-start" />
-              Reply by email
-            </Button>
+            <ReplyByEmail message={message} />
 
             <div className="space-y-1.5">
               <FieldLabel htmlFor="message-status">Status</FieldLabel>
