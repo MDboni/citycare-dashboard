@@ -11,6 +11,12 @@ export const formatDate = (value: string | Date | null | undefined) => {
   return date ? format(date, "d MMM yyyy") : "—";
 };
 
+/** Day and month only, for a chart axis where the year is in the title. */
+export const formatDayMonth = (value: string | Date | null | undefined) => {
+  const date = toDate(value);
+  return date ? format(date, "d MMM") : "—";
+};
+
 export const formatDateTime = (value: string | Date | null | undefined) => {
   const date = toDate(value);
   return date ? format(date, "d MMM yyyy, h:mm a") : "—";

@@ -7,7 +7,12 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { formatBdt, formatBdtShort, formatDate } from "@/lib/format";
+import {
+  formatBdt,
+  formatBdtShort,
+  formatDate,
+  formatDayMonth,
+} from "@/lib/format";
 
 export type MoneyDatum = { date: string; amount: string; count: number };
 
@@ -63,7 +68,7 @@ export function MoneyTrendChart({
           tickMargin={6}
           minTickGap={24}
           tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
-          tickFormatter={(value: string) => formatDate(value).slice(0, 6)}
+          tickFormatter={(value: string) => formatDayMonth(value)}
         />
 
         <YAxis
