@@ -1,4 +1,5 @@
-import { api, apiRequest } from "@/lib/api-client";
+import { api, apiRequest, BASE_URL } from "@/lib/api-client";
+import { getAccessToken, getRefreshToken } from "@/lib/session";
 import type {
   AuthSession,
   GoogleTokenResult,
@@ -101,6 +102,42 @@ export const authApi = {
     }),
 
   logout: () => apiRequest<null>("/auth/logout", { method: "POST" }),
+
+  /**
+   * Sign-out for a page that is already leaving.
+   *
+   * `logout` above cannot be used for that: its Authorization header makes the
+   * browser ask permission with a CORS preflight first, and the page is gone
+   * before the answer arrives — measured, and the session survived. A beacon
+   * posts `text/plain` with no custom headers, which is a request the browser
+   * sends without asking and finishes even after the document is torn down, so
+   * the tokens travel in the body instead. Handing over a refresh token to have
+   * it destroyed only ever takes privilege away from whoever holds it.
+   *
+   * Returns false when the browser declines to queue it — no `sendBeacon`, no
+   * refresh token to send, or the queue is full — and the caller falls back to
+   * the request that has to be waited for.
+   */
+  logoutBeacon: (): boolean => {
+    if (typeof navigator === "undefined" || !navigator.sendBeacon) return false;
+
+    const refreshToken = getRefreshToken();
+    if (!refreshToken) return false;
+
+    try {
+      return navigator.sendBeacon(
+        `${BASE_URL}/auth/logout/beacon`,
+        new Blob(
+          [JSON.stringify({ refreshToken, accessToken: getAccessToken() })],
+          {
+            type: "text/plain;charset=UTF-8",
+          },
+        ),
+      );
+    } catch {
+      return false;
+    }
+  },
 
   logoutAll: () =>
     api<{ revoked: number }>("/auth/logout-all", { method: "POST" }),

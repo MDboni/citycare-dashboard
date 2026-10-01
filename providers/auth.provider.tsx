@@ -93,21 +93,26 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = useCallback(
     async (options?: { everywhere?: boolean }) => {
       /**
-       * Waited for, not fired and forgotten.
-       *
-       * This call is what revokes the refresh token server-side, and a token
-       * that outlives the sign-out that was supposed to kill it is good for a
-       * week. Starting the request and navigating away looks faster and is not
-       * the same thing: the browser has to clear a CORS preflight before the
-       * POST is sent at all, and the page is gone by then. Measured on the
-       * deployment, the screen changed in half a second and the old refresh
-       * token still worked afterwards. So this waits.
+       * The ordinary sign-out goes as a beacon, which the browser finishes
+       * after this page is gone — so the screen can change at once instead of
+       * waiting out a round trip to revoke a session the person has already
+       * left. "Everywhere" is different: it reports how many sessions it ended,
+       * and a number nobody waited for is not worth printing.
        */
-      try {
-        if (options?.everywhere) await authApi.logoutAll();
-        else await authApi.logout();
-      } catch {
-        // A dead session cannot be logged out of; clearing locally is the point.
+      if (options?.everywhere) {
+        try {
+          await authApi.logoutAll();
+        } catch {
+          // A dead session cannot be logged out of; clearing locally is the point.
+        }
+      } else if (!authApi.logoutBeacon()) {
+        // The browser would not queue it. Fall back to the request that has to
+        // be waited for rather than leaving the session alive on the server.
+        try {
+          await authApi.logout();
+        } catch {
+          // Same as above.
+        }
       }
 
       clearSession();
