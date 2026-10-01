@@ -2,7 +2,7 @@
 
 import { ShieldCheckIcon } from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AuthCard } from "@/components/auth/auth-card";
@@ -16,11 +16,11 @@ import {
   type PendingChallenge,
   saveChallenge,
 } from "@/lib/challenge";
+import { leaveAuthScreen } from "@/lib/navigate";
 import { useAuth } from "@/providers";
 import { routes } from "@/routes";
 
 export function TwoFactorForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { signIn } = useAuth();
   const verify = useVerifyLoginOtp();
@@ -83,7 +83,7 @@ export function TwoFactorForm() {
 
       await signIn(result);
       toast.success(`Welcome back, ${result.user.name.split(" ")[0]}.`);
-      router.replace(next);
+      leaveAuthScreen(next);
     } catch (caught) {
       setError(errorMessage(caught));
     }
