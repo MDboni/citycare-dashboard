@@ -92,12 +92,24 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(
     async (options?: { everywhere?: boolean }) => {
+      /**
+       * Waited for, not fired and forgotten.
+       *
+       * This call is what revokes the refresh token server-side, and a token
+       * that outlives the sign-out that was supposed to kill it is good for a
+       * week. Starting the request and navigating away looks faster and is not
+       * the same thing: the browser has to clear a CORS preflight before the
+       * POST is sent at all, and the page is gone by then. Measured on the
+       * deployment, the screen changed in half a second and the old refresh
+       * token still worked afterwards. So this waits.
+       */
       try {
         if (options?.everywhere) await authApi.logoutAll();
         else await authApi.logout();
       } catch {
         // A dead session cannot be logged out of; clearing locally is the point.
       }
+
       clearSession();
       queryClient.clear();
       // The same cache problem as signing in, pointing the other way: every
