@@ -6,7 +6,7 @@ import type {
   PaymentLedgerFilters,
   SecurityEventFilters,
   ServiceRequestFilters,
-} from "@/api";
+} from "@/api-client";
 
 /**
  * Query keys in one file so an invalidation can never miss a list. Each key is

@@ -6,7 +6,7 @@ import {
   type AuditLogFilters,
   adminApi,
   type SecurityEventFilters,
-} from "@/api";
+} from "@/api-client";
 import type { Role, SettingKey, UserStatus } from "@/types";
 import { adminKeys } from "./query-keys";
 

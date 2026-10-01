@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { taxonomyApi } from "@/api";
+import { taxonomyApi } from "@/api-client";
 import { queryKeys } from "./query-keys";
 
 /**

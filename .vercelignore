@@ -17,6 +17,11 @@ tsconfig.tsbuildinfo
 AGENTS.md
 CLAUDE.md
 
+
 # Deliberately NOT ignored:
-#   api/   — these are the API client modules the app imports (`@/api`), not
-#            serverless handlers. Ignoring them breaks the build's imports.
+#   api-client/ - the API client modules the app imports (`@/api-client`).
+#                 It used to be `api/`, and Vercel turns a root `api/` into
+#                 one serverless function per file - 12 of them, which on its
+#                 own hits the Hobby plan's 12-function ceiling and fails the
+#                 deploy. Never name a root folder `api` unless its files
+#                 really are request handlers.

@@ -11,7 +11,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { authApi, usersApi } from "@/api";
+import { authApi, usersApi } from "@/api-client";
 import { queryKeys } from "@/hooks/query-keys";
 import { ApiError } from "@/lib/api-error";
 import {

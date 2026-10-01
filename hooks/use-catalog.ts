@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { catalogApi } from "@/api";
+import { catalogApi } from "@/api-client";
 import { queryKeys } from "./query-keys";
 
 /** The taxonomy barely changes, so it is cached for an hour rather than a minute. */

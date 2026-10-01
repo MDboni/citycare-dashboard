@@ -3,7 +3,7 @@
 import { ExternalLinkIcon, FileIcon, Loader2Icon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { serviceRequestsApi } from "@/api";
+import { serviceRequestsApi } from "@/api-client";
 import { errorMessage } from "@/lib/api-error";
 import { formatDateTime } from "@/lib/format";
 import type { ServiceRequestDocument } from "@/types";

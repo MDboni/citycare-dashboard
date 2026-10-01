@@ -6,7 +6,7 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { type ComplaintFilters, complaintsApi } from "@/api";
+import { type ComplaintFilters, complaintsApi } from "@/api-client";
 import type { AttachmentKind, ComplaintStatus } from "@/types";
 import { queryKeys } from "./query-keys";
 

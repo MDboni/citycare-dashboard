@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { type PaymentLedgerFilters, paymentsApi } from "@/api";
+import { type PaymentLedgerFilters, paymentsApi } from "@/api-client";
 import { adminKeys } from "./query-keys";
 
 /**

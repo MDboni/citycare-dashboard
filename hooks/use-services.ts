@@ -5,7 +5,7 @@ import {
   paymentsApi,
   type ServiceRequestFilters,
   serviceRequestsApi,
-} from "@/api";
+} from "@/api-client";
 import { queryKeys } from "./query-keys";
 
 export const useMyServiceRequests = (filters: ServiceRequestFilters = {}) =>

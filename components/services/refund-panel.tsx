@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Loader2Icon, UndoDotIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { paymentsApi } from "@/api";
+import { paymentsApi } from "@/api-client";
 import { CopyButton } from "@/components/shared/copy-button";
 import { PaymentStatusPill } from "@/components/shared/status-pill";
 import { Badge } from "@/components/ui/badge";

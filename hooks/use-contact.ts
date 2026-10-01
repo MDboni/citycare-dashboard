@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { type ContactMessageFilters, contactApi } from "@/api";
+import { type ContactMessageFilters, contactApi } from "@/api-client";
 import { adminKeys } from "./query-keys";
 
 export const useContactMessages = (filters: ContactMessageFilters) =>

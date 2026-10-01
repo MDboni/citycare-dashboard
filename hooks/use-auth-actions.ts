@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import { authApi } from "@/api";
+import { authApi } from "@/api-client";
 import { errorMessage } from "@/lib/api-error";
 
 /**

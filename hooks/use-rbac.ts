@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { rbacApi } from "@/api";
+import { rbacApi } from "@/api-client";
 import { queryKeys } from "./query-keys";
 
 /**
