@@ -82,4 +82,34 @@ export const paymentsApi = {
 
     return response.blob();
   },
+
+  /**
+   * The payer's receipt, rebuilt by the server on demand. Same shape of problem
+   * as the CSV above — it streams a PDF rather than an envelope and still needs
+   * the bearer token — so it takes the same route around the usual client.
+   *
+   * Only a SUCCESS payment has one, and only an ADMIN may read somebody else's:
+   * staff holding `payments__view_all` without the admin role can see the row
+   * and will be refused the file, which is why the 403 gets its own sentence.
+   */
+  receipt: async (id: string) => {
+    const response = await fetch(`${BASE_URL}/payments/${id}/receipt`, {
+      headers: { Authorization: `Bearer ${getAccessToken() ?? ""}` },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const reason =
+        response.status === 401
+          ? "Your session expired. Sign in again and retry."
+          : response.status === 403
+            ? "Only an admin can download another person's receipt."
+            : response.status === 409
+              ? "Only a completed payment has a receipt."
+              : `The receipt failed with status ${response.status}.`;
+      throw new Error(reason);
+    }
+
+    return response.blob();
+  },
 };

@@ -28,3 +28,6 @@ export const usePaymentSummary = (
 
 export const useDownloadLedgerCsv = () =>
   useMutation({ mutationFn: paymentsApi.downloadLedgerCsv });
+
+export const useDownloadReceipt = () =>
+  useMutation({ mutationFn: paymentsApi.receipt });

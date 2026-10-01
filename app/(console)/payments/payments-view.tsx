@@ -19,6 +19,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { ErrorState } from "@/components/shared/error-state";
 import { CardGridSkeleton, TableSkeleton } from "@/components/shared/loading";
 import { PageHeader } from "@/components/shared/page-header";
+import { ReceiptButton } from "@/components/shared/receipt-button";
 import { StatCard } from "@/components/shared/stat-card";
 import { PaymentStatusPill } from "@/components/shared/status-pill";
 import { Badge } from "@/components/ui/badge";
@@ -347,7 +348,7 @@ export function PaymentsView() {
         </div>
       </div>
 
-      {ledger.isPending && <TableSkeleton rows={8} columns={6} />}
+      {ledger.isPending && <TableSkeleton rows={8} columns={7} />}
 
       {ledger.isError && (
         <ErrorState
@@ -399,6 +400,7 @@ export function PaymentsView() {
                       <TableHead className="text-right">Amount</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead className="min-w-[170px]">Settled</TableHead>
+                      <TableHead className="text-right">Receipt</TableHead>
                     </TableRow>
                   </TableHeader>
 
@@ -494,6 +496,17 @@ function LedgerRow({ row }: { row: PaymentLedgerRow }) {
 
       <TableCell className="text-sm text-muted-foreground">
         {row.paidAt ? formatDateTime(row.paidAt) : "—"}
+      </TableCell>
+
+      {/* Only a completed payment has a receipt — the API answers 409 for any
+          other status, so an em dash is the honest cell rather than a button
+          that is always going to fail. */}
+      <TableCell className="text-right">
+        {row.status === "SUCCESS" ? (
+          <ReceiptButton paymentId={row.id} transactionId={row.transactionId} />
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        )}
       </TableCell>
     </TableRow>
   );
