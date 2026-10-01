@@ -9,7 +9,6 @@ import {
   GaugeIcon,
   InboxIcon,
   LayersIcon,
-  LogOutIcon,
   MapIcon,
   ScrollTextIcon,
   ShieldAlertIcon,
@@ -218,7 +217,7 @@ const isActive = (pathname: string, href: string) =>
 
 export function ConsoleSidebar() {
   const pathname = usePathname();
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
 
   const role = user?.role;
   const visible = (item: NavItem) => {
@@ -302,8 +301,12 @@ export function ConsoleSidebar() {
       <SidebarFooter>
         <SidebarSeparator />
 
-        {/* Who is signed in, spelled out. The header has an avatar menu too,
-            but a sign-out worth finding should not be two clicks inside one. */}
+        {/* Who is signed in, and nothing else. "Your account" and "Sign out"
+            used to sit here as well, which put every one of them twice on the
+            screen: the header's avatar menu already carries both, along with
+            this same name and email. Two of everything made the nav list read
+            as longer than it is, and the duplicate was the half nobody had
+            asked for. */}
         {user && (
           <div className="min-w-0 px-2 py-1 group-data-[collapsible=icon]:hidden">
             <p className="truncate text-sm font-medium">{user.name}</p>
@@ -312,32 +315,6 @@ export function ConsoleSidebar() {
             </p>
           </div>
         )}
-
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              isActive={pathname === routes.account}
-              tooltip="Your account"
-              render={<Link href={routes.account} />}
-            >
-              <UserCogIcon />
-              <span>Your account</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              tooltip="Sign out"
-              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-              onClick={() => {
-                void signOut();
-              }}
-            >
-              <LogOutIcon />
-              <span>Sign out</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
   );
