@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2Icon, ShieldCheckIcon } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { AuthCard } from "@/components/auth/auth-card";
@@ -14,11 +14,7 @@ import { Button } from "@/components/ui/button";
 import { useLogin } from "@/hooks";
 import { toApiError } from "@/lib/api-error";
 import { saveChallenge } from "@/lib/challenge";
-import {
-  DEMO_ACCOUNTS,
-  DEMO_LOGINS_ENABLED,
-  type DemoRole,
-} from "@/lib/demo-accounts";
+import { DEMO_ACCOUNTS, type DemoRole } from "@/lib/demo-accounts";
 import { leaveAuthScreen } from "@/lib/navigate";
 import { useAuth } from "@/providers";
 import { routes } from "@/routes";
@@ -136,19 +132,6 @@ export function LoginForm() {
     },
     [login, next, router, signIn],
   );
-
-  /**
-   * Arriving from the resident app's panel with `?demo=officer|admin`. The ref
-   * keeps a re-render from firing a second sign-in on top of the first.
-   */
-  const demoParam = searchParams.get("demo");
-  const autoRan = useRef(false);
-  useEffect(() => {
-    if (autoRan.current || !DEMO_LOGINS_ENABLED) return;
-    if (demoParam !== "officer" && demoParam !== "admin") return;
-    autoRan.current = true;
-    void runDemo(demoParam);
-  }, [demoParam, runDemo]);
 
   return (
     <AuthCard
