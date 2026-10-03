@@ -1,6 +1,12 @@
 "use client";
 
-import { BellIcon, LogOutIcon, UserCogIcon } from "lucide-react";
+import {
+  BellIcon,
+  LogOutIcon,
+  RefreshCwIcon,
+  TriangleAlertIcon,
+  UserCogIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { RolePill } from "@/components/shared/status-pill";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
@@ -20,12 +26,24 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useUnreadCount } from "@/hooks";
 import { initials } from "@/lib/format";
+import { getAccessToken } from "@/lib/session";
 import { useAuth } from "@/providers";
 import { routes } from "@/routes";
 
 export function ConsoleHeader() {
-  const { user, isLoading, signOut } = useAuth();
+  const { user, isLoading, signOut, refresh } = useAuth();
   const { count } = useUnreadCount();
+
+  /**
+   * A session we hold but cannot describe.
+   *
+   * `/users/me` is what fills this bar, and when it fails — the API unreachable,
+   * a cold start timing out — `user` stays null. Hiding the account menu in that
+   * case took away the only Sign out on the screen and left a console that
+   * looked empty with no way to act on it. So the menu is rendered whenever
+   * there is a session at all, and says plainly which of the two states it is in.
+   */
+  const stranded = !isLoading && !user && Boolean(getAccessToken());
 
   return (
     <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 border-b border-border bg-background/85 px-4 backdrop-blur supports-backdrop-filter:bg-background/65">
@@ -35,12 +53,17 @@ export function ConsoleHeader() {
       <div className="min-w-0 flex-1">
         {isLoading ? (
           <Skeleton className="h-4 w-40" />
+        ) : user ? (
+          <p className="truncate text-sm text-muted-foreground">
+            Signed in as{" "}
+            <span className="font-medium text-foreground">{user.name}</span>
+            {user.department ? ` · ${user.department.name}` : ""}
+          </p>
         ) : (
-          user && (
-            <p className="truncate text-sm text-muted-foreground">
-              Signed in as{" "}
-              <span className="font-medium text-foreground">{user.name}</span>
-              {user.department ? ` · ${user.department.name}` : ""}
+          stranded && (
+            <p className="flex min-w-0 items-center gap-1.5 truncate text-sm text-muted-foreground">
+              <TriangleAlertIcon className="size-4 shrink-0 text-destructive" />
+              Could not reach CityCare. Your session is still signed in.
             </p>
           )
         )}
@@ -71,7 +94,7 @@ export function ConsoleHeader() {
           )}
         </Button>
 
-        {user && (
+        {(user || stranded) && (
           <DropdownMenu>
             <DropdownMenuTrigger
               render={
@@ -84,31 +107,52 @@ export function ConsoleHeader() {
               }
             >
               <Avatar className="size-7">
-                {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt="" />}
+                {user?.avatarUrl && <AvatarImage src={user.avatarUrl} alt="" />}
                 <AvatarFallback className="text-[11px]">
-                  {initials(user.name)}
+                  {user ? initials(user.name) : "?"}
                 </AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end" className="w-60">
-              <DropdownMenuHeader className="space-y-1.5 px-2 py-2 text-foreground">
-                <p className="truncate text-sm font-medium">{user.name}</p>
-                <p className="truncate text-xs font-normal text-muted-foreground">
-                  {user.email}
-                </p>
-                <span className="flex flex-wrap items-center gap-1.5">
-                  <RolePill role={user.role} />
-                  {user.isSuperAdmin && <Badge>Super admin</Badge>}
-                </span>
-              </DropdownMenuHeader>
+              {user ? (
+                <DropdownMenuHeader className="space-y-1.5 px-2 py-2 text-foreground">
+                  <p className="truncate text-sm font-medium">{user.name}</p>
+                  <p className="truncate text-xs font-normal text-muted-foreground">
+                    {user.email}
+                  </p>
+                  <span className="flex flex-wrap items-center gap-1.5">
+                    <RolePill role={user.role} />
+                    {user.isSuperAdmin && <Badge>Super admin</Badge>}
+                  </span>
+                </DropdownMenuHeader>
+              ) : (
+                <DropdownMenuHeader className="space-y-1 px-2 py-2 text-foreground">
+                  <p className="text-sm font-medium">Signed in</p>
+                  <p className="text-xs font-normal text-muted-foreground">
+                    Your profile could not be loaded. Try again, or sign out and
+                    back in.
+                  </p>
+                </DropdownMenuHeader>
+              )}
 
               <DropdownMenuSeparator />
 
-              <DropdownMenuItem render={<Link href={routes.account} />}>
-                <UserCogIcon />
-                Your account
-              </DropdownMenuItem>
+              {user ? (
+                <DropdownMenuItem render={<Link href={routes.account} />}>
+                  <UserCogIcon />
+                  Your account
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem
+                  onClick={() => {
+                    void refresh();
+                  }}
+                >
+                  <RefreshCwIcon />
+                  Try again
+                </DropdownMenuItem>
+              )}
 
               <DropdownMenuSeparator />
 

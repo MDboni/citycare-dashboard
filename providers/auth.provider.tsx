@@ -70,11 +70,16 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     staleTime: 5 * 60 * 1000,
     retry: (failureCount, error) =>
       // An expired session is an answer, not a flake worth retrying.
+      //
+      // One retry, not two: this query gates the whole UI, so every attempt it
+      // makes is time the person spends looking at a skeleton. With a request
+      // timeout on top, an unreachable API now settles into a signed-out screen
+      // they can act on instead of a spinner that never ends.
       !(
         error instanceof ApiError &&
         error.status >= 400 &&
         error.status < 500
-      ) && failureCount < 2,
+      ) && failureCount < 1,
   });
 
   const signIn = useCallback(

@@ -27,7 +27,24 @@ const toSearchParams = (query?: QueryParams) => {
   return Object.keys(params).length ? params : undefined;
 };
 
-const raw = ofetch.create({ baseURL: BASE_URL, credentials: "include" });
+/**
+ * A request that never answers is worse than one that fails.
+ *
+ * Without this, a connection that hangs — a flaky network, an API that is up but
+ * unreachable — leaves every caller waiting forever: the sign-in button spins
+ * with no error, and the header sits on a skeleton rather than offering a way
+ * out. A bounded wait turns all of that back into an ordinary error the UI
+ * already knows how to show. Thirty seconds is generous enough for a cold start
+ * on a serverless function and a slow upload, and short enough that nobody
+ * concludes the app is broken.
+ */
+const REQUEST_TIMEOUT_MS = 30_000;
+
+const raw = ofetch.create({
+  baseURL: BASE_URL,
+  credentials: "include",
+  timeout: REQUEST_TIMEOUT_MS,
+});
 
 /**
  * Refreshing is single-flight. Ten queries can fail their 401 in the same tick;
