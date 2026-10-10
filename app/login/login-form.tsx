@@ -33,13 +33,6 @@ export function LoginForm() {
   const { signIn } = useAuth();
   const login = useLogin();
 
-  /**
-   * A staff account that tried the resident app arrives here with its address
-   * already known, so the only thing left to type is the password. The resident
-   * app sends it; nothing is trusted about it beyond filling in a text box.
-   */
-  const handedOver = searchParams.get("email") ?? "";
-
   const {
     register,
     handleSubmit,
@@ -47,7 +40,7 @@ export function LoginForm() {
     formState: { errors, isSubmitting },
   } = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: handedOver, password: "" },
+    defaultValues: { email: "", password: "" },
   });
 
   const next = searchParams.get("next") ?? routes.home;
@@ -143,11 +136,7 @@ export function LoginForm() {
   return (
     <AuthCard
       title="CityCare staff console"
-      description={
-        handedOver
-          ? "That account is staff, so it signs in here rather than on the resident site. Your password is all that is left."
-          : "For officers and administrators. Citizens use the main CityCare site."
-      }
+      description="For officers and administrators. Citizens use the main CityCare site."
     >
       <form onSubmit={onSubmit} className="space-y-4" noValidate>
         <TextField
